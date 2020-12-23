@@ -18,6 +18,7 @@
         line-height: 100px;
         font-size: 50px;
         text-align: center;
+        color: red;
     }
 </style>
 
@@ -25,21 +26,22 @@
 
 <script>
     let pattern = [
-        [2, 0, 0],
-        [0, 1, 0],
-        [1, 0, 0]
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
     ];
 
     let p2txt = ["","X","O"]
     let xo = 1;
+
 
     console.log(pattern);
 
     function show() {
         let board = document.getElementById("board");
 
+        //
         board.innerHTML = "";
-
         // let childs =  board.childNodes
         // for(let i = childs.length - 1; i >= 0; i--) {
         //     // alert(childs[i].nodeName);
@@ -52,7 +54,7 @@
                 let cell = document.createElement("div") ; //这个我之前不会.   复习document 函数.
                 cell.classList.add("cell")
                 cell.innerText = p2txt[pattern[i][j]]
-                cell.addEventListener("click",()=>move(i,j))
+                cell.addEventListener("click",()=>userMove(i,j))
                 board.appendChild(cell)
             }
             board.appendChild(document.createElement("br"))
@@ -61,12 +63,161 @@
 
 
 
-    function move(r,c) {
+
+
+    function userMove(r,c) {
+        console.log(r,c,pattern);
+
+        if (pattern[r][c] ){return;}
+
         pattern[r][c] = xo;
+        if (check(pattern,xo)){
+            alert(p2txt[xo] + " win");
+        }
+
         xo = 3-xo;
         show();
+        if(willWin(pattern,xo)) {
+            console.log(p2txt[xo] + " will win")
+        }
+        console.log(p2txt[xo] +" " + JSON.stringify(bestChoice(pattern,xo)) )
+        pcMove();
     }
+
+    function pcMove() {
+        let choice = bestChoice(pattern,xo);
+        if (choice.point) {
+            pattern[choice.point[0]][choice.point[1]] = xo;
+        }
+        show();
+        if(willWin(pattern,xo)) {
+            console.log(p2txt[xo] + " will win")
+        }
+
+        xo = 3- xo;
+    }
+
     show();
+
+
+    function check(pattern,xo) {
+        let xoRt = [-1,1,8];
+
+        //row check
+        for (let i = 0; i < 3; i++) {
+            let t = pattern[i][0]*pattern[i][1]*pattern[i][2];
+            if (t==xoRt[xo]) {
+                return true;
+            }
+        }
+
+        //column check
+        for (let i = 0; i < 3; i++) {
+            let t = pattern[0][i]*pattern[1][i]*pattern[2][i];
+            if (t==xoRt[xo]) {
+                return true;
+            }
+        }
+
+        let t = pattern[0][0]* pattern[1][1]* pattern[2][2];
+        if (t==xoRt[xo]) {
+            return true;
+        }
+
+        t = pattern[2][0]* pattern[1][1]* pattern[0][2];
+        if (t==xoRt[xo]) {
+            return true;
+        }
+        return false;
+    }
+
+    // function deepClone(obj) {
+    //
+    //     if (obj instanceof Date) {
+    //         return new Date(obj);
+    //     }
+    //     if (Array.isArray(obj)) {
+    //         return obj.map(o => typeof o === 'object' ? deepClone(o) : o);
+    //     }
+    //
+    //     const result = shallowClone(obj);
+    //     Object.entries(result).forEach(
+    //         ([key, value]) => {
+    //             if (typeof value === 'object') {
+    //                 result[key] = deepClone(value);
+    //             }
+    //         }
+    //     );
+    //     return result;
+    // }
+
+    function deepClone(obj){
+        let newObj=Array.isArray(obj)?[]:{}
+
+        if(obj&&typeof obj ==="object"){
+            for(let key in obj){
+                if(obj.hasOwnProperty(key)){
+                    newObj[key]=(obj && typeof obj[key]==='object')?deepClone(obj[key]):obj[key];
+                }
+            }
+        }
+        return newObj
+    }
+
+    function clone(pattern) {
+        return deepClone(pattern)
+        // return JSON.parse(JSON.stringify(pattern))
+        //return Object.create(pattern)  //对单维数组可以,多维不可以. Object.create 有点类似浅拷贝.
+    }
+
+
+
+    function willWin(pattern,xo) {
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if(pattern[i][j]){continue;}
+                let tmp = clone(pattern);
+                tmp[i][j]=xo;
+                if (check(tmp,xo)) {
+                    return [i,j];
+                }
+            }
+        }
+        return null;
+    }
+
+
+    function bestChoice(pattern, xo) {
+        let p;
+        if (p = willWin(pattern,xo)) {
+            return {
+                point:p,
+                result:1
+            }
+        }
+        //这里没有对手去放, vs 表示对手逻辑. 对手越差,我方越好.
+        let vsResult = 2;
+        let point = null;
+
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (pattern[i][j]){continue;}
+                let tmp = clone(pattern);
+                tmp[i][j] = xo;
+                let vsr = bestChoice(tmp,3-xo).result;
+                if(vsr < vsResult) {
+                    vsResult = vsr
+                    point = [i,j]
+                }
+            }
+        }
+        return {
+            point:point,
+            result: point? -vsResult:0
+        };
+    }
+
+    // console.log(bestChoice(pattern,xo));
 </script>
 
 </body>
