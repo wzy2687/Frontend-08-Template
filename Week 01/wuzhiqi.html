@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>五子棋</title>
+</head>
+<body>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    #game {
+        width: 1000px;
+        height: 1000px;
+        background-color: lemonchiffon;
+        border-width: 1px;
+        border-style: solid;
+        line-height: 0px;
+    }
+
+    .gird {
+        width: 98px;
+        height: 98px;
+        display: inline-block;
+        border-style: solid;
+        border-width: 1px;
+    }
+
+    .chess {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        border-radius: 40px;
+        /*background-color: black;*/
+    }
+
+    .chess0 {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        top: 60px;
+        left: 60px;
+        /*background-color: black;*/
+        border-radius: 40px;
+    }
+
+    .chess1 {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        top: 60px;
+        left: 60px;
+        background-color: white;
+        border-radius: 40px;
+    }
+
+    .chess2 {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        top: 60px;
+        left: 60px;
+        background-color: black;
+        border-radius: 40px;
+    }
+
+</style>
+
+<div id="game">
+    <div  id="board">
+
+    </div>
+
+<!--    <div class="chess2"></div>-->
+</div>
+
+<script>
+
+    board = document.getElementById("board");
+    game = document.getElementById("game")
+    let rowCnt = 9;
+    let colCnt = 9;
+    let chesses = new Array(rowCnt);
+    for (let i = 0; i < rowCnt; i++) {
+        chesses[i] = new Array(colCnt);
+        for (let j = 0; j < colCnt; j++) {
+            chesses[i][j] = 0;
+        }
+    }
+
+    // chesses[1][1] = 0;
+    let chessColor = ["","white","black"];
+    let wb = 1; //白先
+
+
+    function show() {
+        // board.innerHTML = "hello";
+        game.innerHTML = "";
+        board.innerHTML = "";
+        game.appendChild(board);
+
+        for (let i = 0; i < 100; i++) {
+            let cell = document.createElement("div") ; //这个我之前不会.   复习document 函数.
+            cell.classList.add("gird")
+            board.appendChild(cell)
+        }
+
+        for (let i = 0; i < rowCnt; i++) {
+            for (let j = 0; j < rowCnt; j++) {
+                let chess = document.createElement("div") ; //这个我之前不会.   复习document 函数.
+                chess.classList.add("chess");
+                let top = (100*(i+1)-40);
+                let left = (100*(j+1)-40);
+                chess.style.top = top+"px";// (100*(i+1)-40);
+                chess.style.left = left + "px";//  (100*(j+1)-40);
+                if (chesses[i][j]) {
+                    chess.style.backgroundColor = chessColor[chesses[i][j]];
+                }
+
+                chess.addEventListener("click",()=>userMove(i,j))
+
+                game.appendChild(chess);
+                console.log("add cess",chess,chesses[i][j])
+            }
+        }
+
+    }
+
+    function userMove(r,c) {
+        if (chesses[r][c] != 0) return;
+        chesses[r][c] = wb;
+        wb = 3-wb;
+        show();
+    }
+    show()
+</script>
+
+
+</body>
+</html>
