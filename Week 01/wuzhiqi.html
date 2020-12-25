@@ -35,36 +35,6 @@
         /*background-color: black;*/
     }
 
-    .chess0 {
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        top: 60px;
-        left: 60px;
-        /*background-color: black;*/
-        border-radius: 40px;
-    }
-
-    .chess1 {
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        top: 60px;
-        left: 60px;
-        background-color: white;
-        border-radius: 40px;
-    }
-
-    .chess2 {
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        top: 60px;
-        left: 60px;
-        background-color: black;
-        border-radius: 40px;
-    }
-
 </style>
 
 <div id="game">
@@ -118,12 +88,14 @@
                     chess.style.backgroundColor = chessColor[chesses[i][j]];
                 }
 
-                chess.addEventListener("click",()=>userMove(i,j))
-
+                chess.addEventListener("click",()=>userMove(i,j));
                 game.appendChild(chess);
-                console.log("add cess",chess,chesses[i][j])
+                // console.log("add cess",chess,chesses[i][j])
             }
         }
+
+
+
 
     }
 
@@ -133,7 +105,34 @@
         wb = 3-wb;
         show();
     }
-    show()
+    show();
+
+    function willWin(r,c) {
+        //水平方向.  其它方向类似. 这个对我不难. 只是工作量.
+        //留多余时间学习, css, html, dom. 文档.
+
+        let cnt = 1;
+        for (let i = c+1; i < colCnt; i++) {
+            if (chesses[r][i] == wb){
+                cnt += 1;
+            }else {
+                break;
+            }
+        }
+        for (let i = c-1; i >= 0; i--) {
+            if (chesses[r][i] == wb){
+                cnt += 1;
+            }else {
+                break;
+            }
+        }
+        if (cnt >=5) {
+            console.log(wb + " will win.")
+            return;
+        }
+    }
+
+
 </script>
 
 
