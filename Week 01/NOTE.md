@@ -41,3 +41,8 @@ aPromiseObj.then(callback_1, callback_2);//我们可以在它上面绑定回调�
 ```
 
 
+#学号:G20200447080056
+#班期:第8期
+#小组:第2组
+#作业&总结链接:https://github.com/wzy2687/Frontend-08-Template/tree/main/Week%2001
+
