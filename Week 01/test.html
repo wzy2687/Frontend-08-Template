@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+</head>
+<body>
+
+    <script>
+
+        function ShowSth(info ) {
+            console.log("txt:",info);
+        }
+
+        console.log("begin");
+        p = new Promise(resolve => {
+            console.log('int p');
+
+            resolve();
+        }).then(()=>ShowSth("level1_p")).then(()=>ShowSth("level2_p"));
+
+        q = new Promise((resolve, reject) => {
+            console.log('int q');
+
+            resolve();
+        }).then(()=>ShowSth("level1_q")).then(()=>ShowSth("level2_q"));
+
+        console.log("end");
+
+        function sleepMs(ms) {
+            return new Promise((resolve,reject)=>setTimeout(resolve,ms))
+        }
+
+        async function doSth() {
+            console.log("begin--");
+            tick = 0;
+            while (true) {
+                tick += 1;
+                await sleepMs(2000);
+                console.log("tick:",tick);
+            }
+
+            console.log("end---");
+        }
+        console.log("step 1");
+        doSth();
+        console.log("step 2");
+
+    </script>
+
+</body>
+</html>
+
