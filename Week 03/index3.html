@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第三单元</title>
+</head>
+<body>
+<script>
+
+    /*
+    *  me = number | <me> * number | me/number
+    *  ae = me | me + me | me - me | ae + me | ae - me
+    *  e = ae <eof>
+    * */
+
+    //[0-9\.]+   正则表达式, 中的\. 表示"."字符, 地位等同0-9
+    //exec 返回匹配, 在有g, [,(第一个括号),(第二个括号),...,(第n个括号)]
+
+
+    let tokenRe = /([0-9.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(-)/g
+    let tokenName = ["Number","whitespace","LineTerminator","*","/","+","-"]
+
+
+    function* tokenize( source ) {
+        let result = null;
+        let lastIdx = 0;
+
+        while(true) {
+            lastIdx = tokenRe.lastIdx;
+            result = tokenRe.exec(source);  //g exec 每次匹配一个. 直到result 返回不匹配位置null
+                                            //需要看专门的文档.
+            if(!result) break;
+            if(tokenRe.lastIndex - lastIdx > result[0].length) {break;}
+
+            let token = {
+                type:null,
+                value:null,
+            }
+
+            for (let i = 1; i <= tokenName.length; i++) {
+                if (result[i]){
+                    token.type = tokenName[i-1];
+                    console.log(tokenName[i-1]);
+                    break;
+                }
+            }
+            token.value = result[0];
+            // console.log(result);
+            yield token;
+        }
+        yield {
+            type: "EOF",
+        }
+
+    }
+
+    for (let token of tokenize("10.24 + 10 + 35")){
+        console.log(token)
+    }
+
+</script>
+</body>
+</html>
