@@ -38,10 +38,9 @@ async function pull(item) {
     const dirname = resolveDir(item.dirname);
     if (fs.existsSync(dirname)) {
         try {
-            await exec(`git -C ${dirname} pull`, {
-                cwd: './'
-            })
-            console.log(item.repo + 'is pulled');
+            await exec(`git -C ${dirname} reset --hard `, { cwd: './' })
+            await exec(`git -C ${dirname} pull`, { cwd: './' })
+            console.log(item.name + ' : ' + item.repo + 'is pulled');
         } catch (e) {
             console.error(e);
             pull(item);
@@ -63,17 +62,17 @@ function createHtmlTable(rows) {
 async function main(argv) {
     if (argv[2] === 'clone') {
         for (const item of list) {
-            await clone(item, argv[3] === '-f');
+            clone(item, argv[3] === '-f');
         }
     } else if (argv[2] === 'pull') {
         for (const item of list) {
-            await pull(item);
+            pull(item);
         }
     } else if (argv[2] === 'ex' && argv[3]) {
         const dir = fs.readdirSync(argv[3], 'utf8');
         const files = dir.reduce((map, name) => {
             const [id, n] = name.split('-');
-            map[n] = { id, ex: fs.readFileSync(path.resolve(__dirname, argv[3], name))};
+            map[n] = { id, ex: fs.readFileSync(path.resolve(__dirname, argv[3], name)) };
             return map;
         }, {})
         const res = list.map(item => {
