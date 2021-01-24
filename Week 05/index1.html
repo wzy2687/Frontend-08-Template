@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+
+    //Proxy 简单说明.
+
+    let obj = {
+        pa:"abc",
+        pb:"3"
+    };
+
+    let op = new Proxy(obj,{
+        set(target, p, value, receiver) {
+            console.log("set_hook",p,value);
+            target[p] = value;
+            return true; //设置成功, 这里应该返回true, 不是value.
+        }
+    });
+
+
+
+    console.log(op);
+
+</script>
+
+</body>
+</html>

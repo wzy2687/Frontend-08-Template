@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<div id="container">
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+    hello world,hello world,hello world,hello world,
+</div>
+<div id="dragable" style="display:inline-block;width:100px;height:100px;background-color: green">
+
+</div>
+
+<script>
+    let dragable = document.getElementById("dragable");
+    let baseX = 0;
+    let baseY = 0;
+
+
+    dragable.addEventListener("touchstart",function (ev){
+        console.log("touch");
+    })
+
+    dragable.addEventListener("mousedown",function (ev) {
+        let startX = ev.clientX;
+        let startY = ev.clientY;
+
+        let up = (ev)=>{
+            baseX = baseX + ev.clientX - startX;
+            baseY = baseY + ev.clientY - startY;
+            document.removeEventListener("mousemove",move);
+            document.removeEventListener("mouseup",up);
+        } ;
+        let move = ev =>{
+            console.log(ev);
+            // dragable.style.transform = `translate(${ev.clientX+baseX-startX}px,${ev.clientY+baseY-startY}px)`;
+            let range = getNearest(ev.clientX,ev.clientY);
+            console.log(range);
+            range.insertNode(dragable);
+
+        };
+        document.addEventListener("mouseup",up);
+        document.addEventListener("mousemove",move);
+    })
+    let ranges = [];
+    let container = document.getElementById("container");
+    for (let i = 0; i < container.childNodes[0].textContent.length; i++) {
+        let range = document.createRange();
+        range.setStart(container.childNodes[0],i);
+        range.setEnd(container.childNodes[0],i);
+
+        console.log(range.getBoundingClientRect());//css api todo
+        ranges.push(range);
+    }
+
+    function getNearest(x,y) {
+        let min = Infinity;
+        let nearest = null;
+        for (let range of ranges) {
+            let rect = range.getBoundingClientRect(); //必须用的时候取,界面变化会变化
+            let distance = (rect.x-x)**2 + (rect.y-y)**2;
+            if (distance < min) {
+                nearest = range;
+                min = distance;
+            }
+        }
+        return nearest;
+    }
+    document.addEventListener("selectstart",ev => ev.preventDefault());
+
+    // //需要支持op.pa.x 这样的形式.
+    //
+    // let callbacks = new Map();
+    // let reactiveties = new Map();
+    // let usedReactives = [];
+    // let obj = {
+    //     pa:{x:"abc"},
+    //     pb:"3",
+    //     r:100,
+    //     g:100,
+    //     b:100,
+    // };
+    // let op = reactive(obj);
+    // effect( () => {
+    //     document.getElementById("r").value = op.r;
+    // });
+    // effect( () => {
+    //     document.getElementById("g").value = op.g;
+    // });
+    // effect( () => {
+    //     document.getElementById("b").value = op.b;
+    // });
+    //
+    // effect( () => {
+    //     document.getElementById("color").style.backgroundColor = `rgb(${op.r},${op.g},${op.b})`;
+    // });
+    //
+    // document.getElementById("r").addEventListener(
+    //     "input",event=>op.r=event.target.value
+    // );
+    // document.getElementById("g").addEventListener(
+    //     "input",event=>op.g=event.target.value
+    // );
+    // document.getElementById("b").addEventListener(
+    //     "input",event=>op.b=event.target.value
+    // );
+    //
+    // //逻辑好像是对cb 使用对象的某个属性做监听. 设置的时候callback 会被调用.
+    // //不太明白这样做, 有什么目的.
+    //
+    // function effect (cb) {
+    //     usedReactives = [];
+    //     cb();
+    //     console.log(usedReactives);
+    //
+    //     //item[0] 对象
+    //     //item[1] 属性.
+    //     for(let item of usedReactives) {
+    //         if(!callbacks.has(item[0])) {
+    //             callbacks.set(item[0],new Map());
+    //         }
+    //         if(!callbacks.get(item[0]).has(item[1]) ) {
+    //             callbacks.get(item[0]).set(item[1],[]);
+    //         }
+    //         callbacks.get(item[0]).get(item[1]).push(cb);
+    //         //相当于cb,是针对某些变量的属性的.
+    //     }
+    //
+    // }
+    //
+    // function reactive(obj) {
+    //     if(reactiveties.has(obj)){
+    //         return reactiveties.get(obj);
+    //     }
+    //     let rt = new Proxy(obj,{
+    //         set(target, p, value, receiver) {
+    //             // for(let i of callback) {
+    //             //     i();
+    //             // }
+    //             console.log("set_hook",p,value);
+    //             target[p] = value;
+    //             if(callbacks.get(target)){
+    //                 if (callbacks.get(target).get(p)) {
+    //                     for(let cb of callbacks.get(target).get(p)){
+    //                         cb();
+    //                     }
+    //                 }
+    //             }
+    //
+    //
+    //             return true; //设置成功, 这里应该返回true, 不是value.
+    //         },
+    //
+    //         get(obj,prop) {
+    //             console.log("get_hook",prop,typeof prop);
+    //             usedReactives.push([obj,prop]);
+    //             if (typeof obj[prop] === "object") {
+    //                 // 这里每次都new, 会回造成不同访问,不同对象的问题.
+    //                 return reactive(obj[prop]);
+    //             }
+    //             return obj[prop];
+    //         }
+    //     });
+    //     reactiveties.set(obj,rt);
+    //     return rt;
+    // }
+    //
+    //
+    //
+    //
+    // //mdn 上有其它解释.
+    //
+    // console.log(op);
+    // console.log("引用op.pa",op.pa);
+    // op.pa.x= 40;
+    //
+    // console.log("引用op.pb",op.pb);
+    //
+    // op.c = 8;
+
+</script>
+
+</body>
+</html>

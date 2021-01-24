@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+
+    let obj = {
+        pa:"abc",
+        pb:"3"
+    };
+
+    let op = new Proxy(obj,{
+        set(target, p, value, receiver) {
+            console.log("set_hook",p,value);
+            target[p] = value;
+            return true; //设置成功, 这里应该返回true, 不是value.
+        },
+
+        get(obj,prop) {
+            console.log("get_hook",prop);
+            return obj[prop];
+        }
+    });
+
+
+    //mdn 上有其它解释.
+
+    console.log(op);
+    console.log(op.pa);
+    op.c = 8;
+
+</script>
+
+</body>
+</html>

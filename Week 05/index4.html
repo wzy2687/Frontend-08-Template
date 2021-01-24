@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+
+    let callbacks = new Map();
+    let usedReactives = [];
+    let obj = {
+        pa:"abc",
+        pb:"3"
+    };
+    let op = reactive(obj);
+    effect( () => {
+        console.log(" effect here",op.pa);
+    });
+
+    //逻辑好像是对cb 使用对象的某个属性做监听. 设置的时候callback 会被调用.
+    //不太明白这样做, 有什么目的.
+
+    function effect (cb) {
+        usedReactives = [];
+        cb();
+        console.log(usedReactives);
+
+        //item[0] 对象
+        //item[1] 属性.
+        for(let item of usedReactives) {
+            if(!callbacks.has(item[0])) {
+                callbacks.set(item[0],new Map());
+            }
+            if(!callbacks.get(item[0]).has(item[1]) ) {
+                callbacks.get(item[0]).set(item[1],[]);
+            }
+            callbacks.get(item[0]).get(item[1]).push(cb);
+            //相当于cb,是针对某些变量的属性的.
+        }
+
+    }
+
+    function reactive(obj) {
+        return new Proxy(obj,{
+            set(target, p, value, receiver) {
+                // for(let i of callback) {
+                //     i();
+                // }
+                console.log("set_hook",p,value);
+                target[p] = value;
+                if(callbacks.get(target)){
+                    if (callbacks.get(target).get(p)) {
+                        for(let cb of callbacks.get(target).get(p)){
+                            cb();
+                        }
+                    }
+                }
+
+
+                return true; //设置成功, 这里应该返回true, 不是value.
+            },
+
+            get(obj,prop) {
+                console.log("get_hook",prop,typeof prop);
+                usedReactives.push([obj,prop]);
+                return obj[prop];
+            }
+        });
+    }
+
+
+
+
+    //mdn 上有其它解释.
+
+    console.log(op);
+    console.log("引用op.pa",op.pa);
+    op.pa= 40;
+
+    console.log("引用op.pb",op.pb);
+
+    op.c = 8;
+
+</script>
+
+</body>
+</html>
