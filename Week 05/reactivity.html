@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reactivity</title>
+    <style>
+        label {
+            display: inline-block;
+            width: 20px;
+        }
+
+        #color {
+            display: inline-block;
+            width: 70px;
+            height: 70px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div style="display: inline-block;">
+        <label for="r">R: </label><input id="r" type="range" min=0 max=255 value=0 /><br />
+        <label for="g">G: </label><input id="g" type="range" min=0 max=255 value=0 /><br />
+        <label for="b">B: </label><input id="b" type="range" min=0 max=255 value=0 /><br />
+    </div>
+    <div id="color"></div>
+    <script>
+        let obj = { r: 0, g: 0, b: 0 };
+        let proxy = reactivity(obj);
+
+        const colorEl = document.getElementById('color');
+        const rEl = document.getElementById('r');
+        const gEl = document.getElementById('g');
+        const bEl = document.getElementById('b');
+
+        rEl.addEventListener('input', (event) => proxy.r = event.target.value);
+        gEl.addEventListener('input', (event) => proxy.g = event.target.value);
+        bEl.addEventListener('input', (event) => proxy.b = event.target.value);
+
+        effect(() => {
+            rEl.value = proxy.r;
+            gEl.value = proxy.g;
+            bEl.value = proxy.b;
+            colorEl.style.backgroundColor = `rgb(${proxy.r},${proxy.g},${proxy.b})`;
+        })
+
+        async function effect(callback) {
+            reactivity.Dep = callback;
+            await callback();
+            reactivity.Dep = null;
+        }
+
+        function reactivity(target) {
+            if (!reactivity.reactivities) {
+                reactivity.reactivities = new Map;
+            }
+            if (reactivity.reactivities.has(target)) {
+                return reactivity.reactivities.get(target);
+            }
+
+            const callbacks = new Map;
+            // 代理对象，实现基本操作的拦截和自定义，而不会像defineProperty修改原有对象的属性描述符
+            let proxy = new Proxy(target, {
+                get(obj, prop) {
+                    if (!callbacks.has(prop)) {
+                        callbacks.set(prop, new Set);
+                    }
+                    if (reactivity.Dep && !callbacks.get(prop).has(reactivity.Dep)) {
+                        callbacks.get(prop).add(reactivity.Dep);
+                    }
+                    if (typeof obj[prop] === 'object') {
+                        return reactivity(obj[prop]);
+                    }
+                    return obj[prop];
+                },
+                set(obj, prop, value) {
+                    // 修改proxy.r为300抛出错误，修改obj.r=300不抛出，验证proxy不修改对象原有属性描述符
+                    if (value < 0 || value > 255) {
+                        throw new Error('value is out of bounds');
+                    }
+                    obj[prop] = value;
+                    if (callbacks.has(prop)) {
+                        for (const callback of callbacks.get(prop)) {
+                            callback();
+                        };
+                    }
+                    return true;
+                }
+            })
+            reactivity.reactivities.set(target, proxy);
+            return proxy;
+        }
+
+    </script>
+</body>
+
+</html>
