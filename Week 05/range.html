@@ -47,6 +47,8 @@
     </div>
     <div id="dragable" style="display:inline-block;width: 100px;height: 100px;background: pink;"></div>
     <script>
+        const dragable = document.getElementById('dragable');
+        const container = document.getElementById('container');
         const node = container.childNodes[0];
         const text = node.textContent;
         const ranges = [];
@@ -57,26 +59,51 @@
             ranges[i] = range;
         }
 
-        let baseX = 0;
-        let baseY = 0;
+        // let baseX = 0;
+        // let baseY = 0;
         dragable.addEventListener('mousedown', (event) => {
-            let startX = event.pageX;
-            let startY = event.pageY;
+            // let startX = event.pageX;
+            // let startY = event.pageY;
             const mousemove = (event) => {
-                let distX = baseX + event.pageX - startX;
-                let distY = baseY + event.pageY - startY;
-                dragable.style.transform = `transform(${distX}px,${distY}px)`;
+                // let offsetX = event.pageX - startX;
+                // let offsetY = event.pageY - startY;
+                // startX = event.pageX;
+                // startY = event.pageY;
+                // const { left, top, width, height } = dragable.getBoundingClientRect();
+                // if (left <= 0 && offsetX < 0 ||
+                //     left + width >= window.innerWidth && offsetX > 0 ||
+                //     top <= 0 && offsetY < 0 ||
+                //     top + height >= window.innerHeight && offsetY > 0)
+                //     return;
+                // baseX += offsetX;
+                // baseY += offsetY;
+                const range = getNearest(event.pageX, event.pageY);
+                range.insertNode(dragable);
+                // dragable.style.transform = `translate(${baseX}px,${baseY}px)`;
             }
             const mouseup = (event) => {
-                baseX += event.pageX - startX;
-                baseY += event.pageY - startY;
-                dragable.style.transform = `transform(${baseX}px,${baseY}px)`;
                 document.removeEventListener('mousemove', mousemove);
                 document.removeEventListener('mouseup', mouseup);
             }
             document.addEventListener('mousemove', mousemove);
             document.addEventListener('mouseup', mouseup);
         })
+
+        document.addEventListener('selectstart', (event) => event.preventDefault());
+
+        function getNearest(x, y) {
+            let nearest = null;
+            let distance = Infinity;
+            for (const range of ranges) {
+                const { left, top } = range.getBoundingClientRect();
+                let d = (x - left) ** 2 + (y - top) ** 2
+                if (d < distance) {
+                    nearest = range;
+                    distance = d;
+                }
+            }
+            return nearest;
+        }
 
     </script>
 </body>
