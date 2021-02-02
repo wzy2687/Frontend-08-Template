@@ -71,18 +71,22 @@ async function main(argv) {
     } else if (argv[2] === 'ex' && argv[3]) {
         const dir = fs.readdirSync(argv[3], 'utf8');
         const files = dir.reduce((map, name) => {
-            const [id, n] = name.split('-');
-            map[n] = { id, ex: fs.readFileSync(path.resolve(__dirname, argv[3], name)) };
+            const [id, n, lesson] = name.split(/[-\.]/);
+            if (!map[n]) map[n] = [];
+            map[n].push({ id, ex: fs.readFileSync(path.resolve(__dirname, argv[3], name)), lesson });
+            map[n].sort((a, b) => a.lesson - b.lesson);
             return map;
-        }, {})
-        const res = list.map(item => {
-            const { id, ex } = files[item.n] || {};
-            if (!id) {
-                return ['404', item.n, item.g, item.name];
-            } else {
-                return [id, item.n, item.g, item.name, `<a href="javascript:openURL('data:text/html;charset=utf-8;base64,${ex.toString('base64')}')" >打开</a>`];
+        }, {});
+        const res = list.reduce((total, item) => {
+            for (const { id, ex, lesson } of files[item.n] || []) {
+                if (!id) {
+                    total.push(['404', item.n, item.g, item.name]);
+                } else {
+                    total.push([id, item.n, item.g, item.name, `<a href="javascript:openURL('data:text/html;charset=utf-8;base64,${ex.toString('base64')}')" >第${lesson}节</a>`]);
+                }
             }
-        })
+            return total;
+        }, [])
         createHtmlTable(res);
     }
 }
