@@ -39,10 +39,10 @@ async function pull(item) {
     if (fs.existsSync(dirname)) {
         try {
             await exec(`git -C ${dirname} reset --hard `, { cwd: './' })
-            await exec(`git -C ${dirname} pull`, { cwd: './' })
-            console.log(item.name + ' : ' + item.repo + 'is pulled');
+            const echo = await exec(`git -C ${dirname} pull`, { cwd: './' })
+            console.log('\x1B[32m%s\x1B[0m', item.name + ' : ' + item.repo + ' : ' + echo.stdout.replace(/\n$/, ''));
         } catch (e) {
-            console.error(e);
+            console.error('\x1B[31m%s\x1B[0m', item.name + ' : ' + item.repo + ' : ' + e.stderr.replace(/\n$/, ''));
             pull(item);
         }
     } else {
