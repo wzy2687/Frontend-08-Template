@@ -146,12 +146,19 @@ function StringToNumber(str, radix = 10) {
 }
 ```
 
-> 同学们可以先完成整数部分，完成后使用parseInt(num,radix?)及N.toString(radix?)对比结果，整数部分完全理解过后再尝试处理小数部分
+完整代码地址：https://github.com/TurnerXi/Frontend-08-Template/blob/master/Week%2007/number.js
+
+> 同学们可以先完成整数部分，完成后使用 parseInt(num,radix?)及 N.toString(radix?)对比结果，整数部分完全理解过后再尝试处理小数部分
 
 ## 二、尝试找出 JavaScript 引擎里面 Realm 所有的对象，使用一个 JS 数据可视化的框架去做一个可视化。提交至 GitHub。
-1. 首先题目要求找出JavaScript引擎里面Realm所有的对象，因此不需要包含浏览器特有的对象
-2. Realm表示一个独特的全局环境，包含内置对象及全局对象(在浏览器中为window，node中为global)
+
+1. 首先题目要求找出 JavaScript 引擎里面 Realm 所有的对象，因此不需要包含浏览器特有的对象
+2. Realm 表示一个独特的全局环境，包含内置对象及全局对象(在浏览器中为 window，node 中为 global)
 3. 该表表示知名的内置对象https://262.ecma-international.org/7.0/#table-7
 
+代码地址：https://github.com/TurnerXi/Frontend-08-Template/blob/master/Week%2007/Realm.js
+演示地址：https://turnerxi.github.io/Frontend-08-Template/Week%2007/index.html
+
 # 参考资料
+
 1. [WhatareRealms](https://github.com/tc39/proposal-realms#WhatareRealms)
